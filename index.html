@@ -116,6 +116,7 @@
   <button class="tab" data-panel="groot">Groot formaat</button>
   <button class="tab" data-panel="brochure">Brochures</button>
   <button class="tab" data-panel="doordruk">Doordruksets</button>
+  <button class="tab" data-panel="offset">✂️ Offset</button>
   <button class="tab" data-panel="verzamel" id="tab-verzamel">🧺 Verzamelorder</button>
   <button class="tab" data-panel="overzicht">📋 Overzicht</button>
   <button class="tab" data-panel="instellingen">⚙️ Instellingen</button>
@@ -324,6 +325,71 @@
   </div>
 </section>
 
+<!-- ══════════ OFFSET & SNIJBON ══════════ -->
+<section class="panel" id="panel-offset">
+  <div class="grid">
+    <div class="card">
+      <h2>Specificaties</h2>
+      <div class="field"><label>Onderwerp</label><input type="text" id="o-onderwerp" placeholder="Bijv. A3+ examenpapier lijntjes en ruitjes"></div>
+      <div class="row3">
+        <div class="field"><label>Netto oplage (stuks)</label><input type="number" id="o-netto" value="6000" min="1"></div>
+        <div class="field"><label>Eindproduct per volvel</label><input type="number" id="o-pervel" value="4" min="1"></div>
+        <div class="field"><label>Snijden in (delen)</label><input type="number" id="o-snijdenin" value="2" min="1"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Volformaat breedte (cm)</label><input type="number" id="o-breedte" value="72" step="0.1"></div>
+        <div class="field"><label>Volformaat hoogte (cm)</label><input type="number" id="o-hoogte" value="102" step="0.1"></div>
+        <div class="field"><label>Gramsgewicht (g/m²)</label><input type="number" id="o-gram" value="70"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Substraat / papiernaam</label><input type="text" id="o-papiernaam" value="Multioffset NI 70 g/m²"></div>
+        <div class="field"><label>Papierprijs per volvel (€)</label><input type="number" id="o-papierprijs" value="0.12" step="0.01"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Machine</label>
+          <select id="o-machine">
+            <option selected>Printmaster PM 74/2</option>
+            <option>Digitale pers (SRA3)</option>
+            <option>Grootformaatprinter</option>
+          </select>
+        </div>
+        <div class="field"><label>Kleuren</label><input type="text" id="o-kleuren" value="1+1"></div>
+        <div class="field"><label>Drukgangen</label><input type="number" id="o-gangen" value="1" min="1"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Aantal platen</label><input type="number" id="o-platen" value="2" min="0"></div>
+        <div class="field"><label>Looprichting</label>
+          <select id="o-looprichting"><option selected>Langlopend</option><option>Breedlopend</option></select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="o-proef"> Proefdruk vooraf</label>
+      <h2 style="margin-top:18px">Snijbon-gegevens</h2>
+      <div class="row3">
+        <div class="field"><label>Ordernummer</label><input type="text" id="o-ordernr" placeholder="Bijv. O-24-1009"></div>
+        <div class="field"><label>Klantnummer</label><input type="text" id="o-klantnr" placeholder="Bijv. K00628"></div>
+        <div class="field"><label>Telefoon klant</label><input type="text" id="o-telefoon" placeholder="Bijv. 077 3970880"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Contactpersoon klant</label><input type="text" id="o-contact"></div>
+        <div class="field"><label>Pers substraatgrootte (na snijden)</label><input type="text" id="o-persformaat" placeholder="Bijv. 49,00 x 69,60"></div>
+      </div>
+    </div>
+    <div class="card result">
+      <h2>Calculatie</h2>
+      <div id="o-result"></div>
+      <p class="info">Sla de calculatie op — daarna maak je vanuit het Overzicht de snijbon en materiaalcalculatie aan.</p>
+      <div class="save-box" id="save-offset">
+        <div class="row3">
+          <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
+          <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
+        </div>
+        <button class="btn-save" onclick="saveCalc('offset')">💾 Opslaan in overzicht</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════ VERZAMELORDER ══════════ -->
 <section class="panel" id="panel-verzamel">
   <div class="grid">
@@ -404,6 +470,15 @@ const S = {
     nietjes:        { label: "Nietjes per boekje (€)", value: 0.02 },
     lijm:           { label: "Lijmbinding per boekje (€)", value: 0.45 },
     afwerkPerUur:   { label: "Vergaren/binden (boekjes/uur)", value: 120 },
+  },
+  offset: {
+    inschietOffset: { label: "Inschiet offset (%)", value: 4 },
+    plaatprijs:     { label: "Drukplaat per stuk (€)", value: 7.50 },
+    drukPer1000:    { label: "Drukkosten per 1.000 vel per gang (€)", value: 12.00 },
+    instelMin:      { label: "Insteltijd pers (min)", value: 30 },
+    persSnelheid:   { label: "Perssnelheid (vellen/uur)", value: 8000 },
+    snijMinPer1000: { label: "Snijden: min per 1.000 volvel", value: 12 },
+    stapelFactor:   { label: "Stapelhoogte (cm per 1.000 vel per 100 g/m²)", value: 12.5 },
   },
   doordruk: {
     ncrVel:         { label: "NCR-papier per SRA3-vel (€)", value: 0.09 },
@@ -541,6 +616,27 @@ function calcDoordruk(inp) {
   return r;
 }
 
+function calcOffset(inp) {
+  const brutoVellen = Math.ceil(inp.netto / inp.perVel * (1 + v("offset", "inschietOffset") / 100));
+  const papier = brutoVellen * inp.papierprijs;
+  const platen = inp.platen * v("offset", "plaatprijs");
+  const drukken = (brutoVellen / 1000) * v("offset", "drukPer1000") * inp.gangen;
+  const instelMin = v("offset", "instelMin") * inp.gangen;
+  const drukMin = (brutoVellen / v("offset", "persSnelheid")) * 60 * inp.gangen;
+  const snijMin = (brutoVellen / 1000) * v("offset", "snijMinPer1000");
+  const arbeid = ((instelMin + drukMin + snijMin) / 60) * v("algemeen", "uurtarief");
+  const opstart = v("algemeen", "opstart") + (inp.proef ? v("algemeen", "proefdruk") : 0);
+  const r = finish({ regels: [
+    ["Papier (" + brutoVellen.toLocaleString("nl-NL") + " volvel, incl. inschiet)", papier],
+    ["Drukplaten (" + inp.platen + "×)", platen],
+    ["Drukken (" + inp.gangen + " gang" + (inp.gangen > 1 ? "en" : "") + ")", drukken],
+    ["Arbeid: instellen, drukken, snijden (" + Math.round(instelMin + drukMin + snijMin) + " min)", arbeid],
+    ["Opstartkosten" + (inp.proef ? " + proefdruk" : ""), opstart],
+  ], aantal: inp.netto });
+  r.subInfo = brutoVellen.toLocaleString("nl-NL") + " vel " + inp.breedte + "×" + inp.hoogte + " cm";
+  return r;
+}
+
 function finish({ regels, aantal }) {
   const kostprijs = regels.reduce((s, r) => s + r[1], 0);
   const margePct = v("algemeen", "marge");
@@ -551,8 +647,8 @@ function finish({ regels, aantal }) {
 }
 /* ═════════════════ EINDE REKENFUNCTIES ═════════════════ */
 
-const PRODUCT_LABELS = { klein: "Klein drukwerk", groot: "Groot formaat", brochure: "Brochure", doordruk: "Doordruksets", verzamel: "Verzamelorder" };
-const ADDABLE = ["klein", "groot", "brochure", "doordruk"];
+const PRODUCT_LABELS = { klein: "Klein drukwerk", groot: "Groot formaat", brochure: "Brochure", doordruk: "Doordruksets", offset: "Offset", verzamel: "Verzamelorder" };
+const ADDABLE = ["klein", "groot", "brochure", "doordruk", "offset"];
 const LAST = {}; // laatste calculatie + specs per tabblad
 
 function renderResult(el, r, tab, specs) {
@@ -788,6 +884,14 @@ async function saveCalc(tab) {
     medewerker: box.querySelector(".sb-medewerker").value,
     gripp: box.querySelector(".sb-gripp").value.trim(),
     onderwerp: getOnderwerp(specs),
+    snijbon: tab === "offset" ? {
+      ...gatherOffset(),
+      ordernr: $("o-ordernr").value.trim(),
+      klantnr: $("o-klantnr").value.trim(),
+      telefoon: $("o-telefoon").value.trim(),
+      contact: $("o-contact").value.trim(),
+      persformaat: $("o-persformaat").value.trim(),
+    } : null,
     klant, specs,
     r: { regels: r.regels, kostprijs: r.kostprijs, margePct: r.margePct, marge: r.marge,
          verkoopEx: r.verkoopEx, verkoopIncl: r.verkoopIncl, perStuk: r.perStuk,
@@ -859,7 +963,9 @@ function renderOverzicht() {
       <td>${escapeHtml(rec.medewerker)}</td>
       <td class="num">${euro(rec.r.verkoopEx)}</td>
       <td style="white-space:nowrap; text-align:right">
-        <button class="btn-mini" onclick="pdfRecord('${rec.id}')" title="Download PDF">PDF</button>
+        <button class="btn-mini" onclick="pdfRecord('${rec.id}')" title="Klantcalculatie (PDF)">PDF</button>
+        <button class="btn-mini" onclick="materiaalRecord('${rec.id}')" title="Materiaalcalculatie, intern (PDF)">Mat.</button>
+        <button class="btn-mini" onclick="snijbonRecord('${rec.id}')" title="Snijbon / productiebon (PDF)">✂ Bon</button>
         <button class="btn-mini" onclick="deleteRecord('${rec.id}')" title="Verwijderen">✕</button>
       </td></tr>`;
   }
@@ -972,6 +1078,187 @@ function updateBrochure() {
     proef: $("b-proef").checked,
   }), "brochure", specs);
 }
+function gatherOffset() {
+  return {
+    netto: +$("o-netto").value || 1,
+    perVel: +$("o-pervel").value || 1,
+    snijdenIn: +$("o-snijdenin").value || 1,
+    breedte: +$("o-breedte").value || 72,
+    hoogte: +$("o-hoogte").value || 102,
+    gram: +$("o-gram").value || 70,
+    papiernaam: $("o-papiernaam").value.trim(),
+    papierprijs: +$("o-papierprijs").value || 0,
+    machine: $("o-machine").value,
+    kleuren: $("o-kleuren").value.trim(),
+    gangen: +$("o-gangen").value || 1,
+    platen: +$("o-platen").value || 0,
+    looprichting: $("o-looprichting").value,
+    proef: $("o-proef").checked,
+  };
+}
+function updateOffset() {
+  const inp = gatherOffset();
+  const specs = [
+    ...onderwerpSpec("o-onderwerp"),
+    ["Netto oplage", inp.netto.toLocaleString("nl-NL") + " stuks"],
+    ["Volformaat", inp.breedte + " × " + inp.hoogte + " cm, " + inp.looprichting.toLowerCase()],
+    ["Substraat", inp.papiernaam + " (" + inp.gram + " g/m²)"],
+    ["Machine", inp.machine],
+    ["Kleuren", inp.kleuren + " (" + inp.platen + " platen, " + inp.gangen + " gang" + (inp.gangen > 1 ? "en" : "") + ")"],
+    ["Snijden", "in " + inp.snijdenIn + " delen, " + inp.perVel + " eindproducten per volvel"],
+    ["Proefdruk", jaNee(inp.proef)],
+  ];
+  renderResult($("o-result"), calcOffset(inp), "offset", specs);
+}
+
+/* ═════════════════ SNIJBON & MATERIAALCALCULATIE (vanuit overzicht) ═════════════════ */
+function bonHelpers(doc) {
+  const dark = [29, 29, 27], orange = [240, 135, 0], grey = [107, 107, 104];
+  const blok = (x, y, w, h, titel) => {
+    doc.setDrawColor(...dark); doc.setLineWidth(0.4); doc.rect(x, y, w, h);
+    doc.setFillColor(...dark); doc.rect(x, y, w, 7, "F");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...orange);
+    doc.text(titel, x + 2.5, y + 5);
+    doc.setTextColor(...dark);
+  };
+  const regel = (x, y, label, val, lw = 42) => {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...grey);
+    doc.text(label, x + 2.5, y);
+    doc.setFont("helvetica", "normal"); doc.setTextColor(...dark);
+    doc.text(String(val || "—"), x + 2.5 + lw, y);
+  };
+  const kop = (titel, sub) => {
+    doc.setFillColor(...dark); doc.rect(0, 0, 210, 26, "F");
+    try { doc.addImage(LOGO_PNG, "PNG", 14, 4.5, 17, 17); } catch (e) {}
+    doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.setTextColor(255, 255, 255);
+    doc.text(titel, 105, 13, { align: "center" });
+    doc.setFontSize(9); doc.setFont("helvetica", "normal");
+    doc.text(sub, 105, 20, { align: "center" });
+  };
+  const voet = () => {
+    const nu = new Date();
+    doc.setFontSize(7.5); doc.setTextColor(...grey); doc.setFont("helvetica", "normal");
+    doc.text("Afgedrukt: " + nu.toLocaleDateString("nl-NL") + " " + nu.toLocaleTimeString("nl-NL") + "  ·  MarketingMakkers, Handelstraat 17, 5961 PV Horst", 14, 287);
+  };
+  return { blok, regel, kop, voet, dark, orange, grey };
+}
+
+function snijbonRecord(recId) {
+  if (!window.jspdf) { alert("PDF-bibliotheek kon niet geladen worden. Controleer je internetverbinding en herlaad de pagina."); return; }
+  const rec = DB_CACHE.find(x => x.id === recId);
+  if (!rec) return;
+  const doc = new window.jspdf.jsPDF();
+  const H = bonHelpers(doc);
+  const W = 210, M = 14, R = W - M;
+  const nu = new Date();
+  const s = rec.snijbon && rec.snijbon.netto ? rec.snijbon : null;
+  const ordernr = (s && s.ordernr) || rec.gripp || rec.id;
+
+  H.kop(s ? "SNIJBON" : "PRODUCTIEBON", nu.toLocaleDateString("nl-NL") + "  ·  " + rec.medewerker.toUpperCase() + "  ·  Ref. " + rec.id);
+  doc.setTextColor(...H.dark); doc.setFont("helvetica", "bold"); doc.setFontSize(26);
+  doc.text(ordernr, W / 2, 40, { align: "center" });
+
+  let y = 50;
+  // Klant/opdracht + ordermanager
+  H.blok(M, y, 110, 44, "KLANT / OPDRACHT");
+  H.regel(M, y + 13, "Klant", rec.klant, 26);
+  H.regel(M, y + 19, "Klantnr.", s ? s.klantnr : "", 26);
+  H.regel(M, y + 25, "Telefoon", s ? s.telefoon : "", 26);
+  H.regel(M, y + 31, "Contact", s ? s.contact : "", 26);
+  doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...H.grey); doc.text("Opdracht", M + 2.5, y + 37);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(...H.dark);
+  const oms = (rec.onderwerp ? rec.onderwerp + " — " : "") + rec.product + ", " + rec.r.aantal.toLocaleString("nl-NL") + " " + (rec.r.eenheid || "stuk") + "s";
+  doc.text(doc.splitTextToSize(oms, 78), M + 28.5, y + 37);
+  H.blok(M + 114, y, R - M - 114, 44, "ORDERMANAGER");
+  H.regel(M + 114, y + 13, "Verantwoordelijke", rec.medewerker, 32);
+  H.regel(M + 114, y + 19, "Gripp-nummer", rec.gripp, 32);
+  H.regel(M + 114, y + 25, "Calculatiedatum", new Date(rec.datum).toLocaleDateString("nl-NL"), 32);
+  H.regel(M + 114, y + 31, "Printdatum", nu.toLocaleDateString("nl-NL"), 32);
+  y += 50;
+
+  if (s) {
+    // Volledige snijbon (offset)
+    const brutoVellen = Math.ceil(s.netto / s.perVel * (1 + v("offset", "inschietOffset") / 100));
+    const naSnijden = brutoVellen * s.snijdenIn;
+    const stapelCm = (brutoVellen / 1000) * (s.gram / 100) * v("offset", "stapelFactor");
+    H.blok(M, y, R - M, 32, "MACHINE & SUBSTRAAT");
+    H.regel(M, y + 13, "Machine", s.machine);
+    H.regel(M, y + 19, "Substraat", s.papiernaam + "  ·  " + s.gram + " g/m²");
+    H.regel(M, y + 25, "Kleuren / platen", s.kleuren + "  ·  " + s.platen + " platen  ·  " + s.gangen + " drukgang(en)");
+    H.regel(M + 110, y + 13, "Looprichting", s.looprichting, 30);
+    y += 38;
+    H.blok(M, y, R - M, 26, "SUBSTRAAT VOLFORMAAT");
+    H.regel(M, y + 13, "Formaat", s.breedte.toLocaleString("nl-NL") + " × " + s.hoogte.toLocaleString("nl-NL") + " cm");
+    H.regel(M, y + 19, "Aantal vellen", brutoVellen.toLocaleString("nl-NL") + " stuks (incl. " + v("offset", "inschietOffset") + "% inschiet)");
+    H.regel(M + 110, y + 13, "Stapelhoogte ±", stapelCm.toFixed(1) + " cm", 30);
+    y += 32;
+    H.blok(M, y, R - M, 32, "SNIJDEN");
+    H.regel(M, y + 13, "Snijden in", s.snijdenIn + " delen");
+    H.regel(M, y + 19, "Pers substraatgrootte", s.persformaat);
+    H.regel(M, y + 25, "Aantal na snijden", naSnijden.toLocaleString("nl-NL") + " stuks");
+    H.regel(M + 110, y + 13, "Netto oplage", s.netto.toLocaleString("nl-NL") + " stuks", 30);
+  } else {
+    // Generieke productiebon vanuit specs + calculatieregels
+    const specs = rec.specs.filter(x => x[0] !== "Onderwerp");
+    const h1 = 12 + specs.length * 6;
+    H.blok(M, y, R - M, h1, "SPECIFICATIES");
+    specs.forEach((sp, i) => H.regel(M, y + 13 + i * 6, sp[0], sp[1], 48));
+    y += h1 + 6;
+    const stappen = rec.r.regels.map(x => x[0]);
+    const h2 = 12 + stappen.length * 6;
+    H.blok(M, y, R - M, h2, "MATERIAAL & BEWERKINGEN");
+    stappen.forEach((st, i) => {
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...H.dark);
+      doc.text("•  " + st, M + 2.5, y + 13 + i * 6);
+    });
+  }
+
+  H.voet();
+  doc.save((s ? "snijbon-" : "productiebon-") + ordernr.replace(/[^\w\-]+/g, "_") + ".pdf");
+}
+
+function materiaalRecord(recId) {
+  if (!window.jspdf) { alert("PDF-bibliotheek kon niet geladen worden. Controleer je internetverbinding en herlaad de pagina."); return; }
+  const rec = DB_CACHE.find(x => x.id === recId);
+  if (!rec) return;
+  const doc = new window.jspdf.jsPDF();
+  const H = bonHelpers(doc);
+  const W = 210, M = 14, R = W - M;
+
+  H.kop("MATERIAALCALCULATIE", "Intern — kostprijzen zonder marge  ·  Ref. " + rec.id);
+  let y = 38;
+  const meta = [["Referentie", rec.id], ["Gripp-nummer", rec.gripp || "—"], ["Klant", rec.klant],
+    ["Onderwerp", rec.onderwerp || "—"], ["Product", rec.product], ["Gemaakt door", rec.medewerker],
+    ["Datum", new Date(rec.datum).toLocaleDateString("nl-NL")]];
+  const h1 = 12 + meta.length * 6;
+  H.blok(M, y, R - M, h1, "ORDERGEGEVENS");
+  meta.forEach((m, i) => H.regel(M, y + 13 + i * 6, m[0], m[1], 42));
+  y += h1 + 6;
+
+  const specs = rec.specs.filter(x => x[0] !== "Onderwerp");
+  const h2 = 12 + specs.length * 6;
+  H.blok(M, y, R - M, h2, "SPECIFICATIES");
+  specs.forEach((sp, i) => H.regel(M, y + 13 + i * 6, sp[0], sp[1], 48));
+  y += h2 + 6;
+
+  const h3 = 12 + rec.r.regels.length * 7 + 9;
+  H.blok(M, y, R - M, h3, "MATERIALEN & BEWERKINGEN (KOSTPRIJS)");
+  let yy = y + 14;
+  for (const [label, bedrag] of rec.r.regels) {
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...H.dark);
+    doc.text(doc.splitTextToSize(label, R - M - 40), M + 2.5, yy);
+    doc.text(euro(bedrag), R - 2.5, yy, { align: "right" });
+    yy += 7;
+  }
+  doc.setDrawColor(...H.dark); doc.line(M + 2.5, yy - 3, R - 2.5, yy - 3);
+  doc.setFont("helvetica", "bold");
+  doc.text("Totale kostprijs", M + 2.5, yy + 2);
+  doc.text(euro(rec.r.kostprijs), R - 2.5, yy + 2, { align: "right" });
+
+  H.voet();
+  doc.save("materiaal-" + rec.id + ".pdf");
+}
+
 function updateDoordruk() {
   const specs = [
     ...onderwerpSpec("d-onderwerp"),
@@ -994,15 +1281,16 @@ function updateDoordruk() {
     proef: $("d-proef").checked,
   }), "doordruk", specs);
 }
-function updateAll() { updateKlein(); updateGroot(); updateBrochure(); updateDoordruk(); }
+function updateAll() { updateKlein(); updateGroot(); updateBrochure(); updateDoordruk(); updateOffset(); }
 
 document.querySelectorAll("#panel-klein input, #panel-klein select").forEach(e => e.addEventListener("input", updateKlein));
 document.querySelectorAll("#panel-groot input, #panel-groot select").forEach(e => e.addEventListener("input", updateGroot));
 document.querySelectorAll("#panel-brochure input, #panel-brochure select").forEach(e => e.addEventListener("input", updateBrochure));
 document.querySelectorAll("#panel-doordruk input, #panel-doordruk select").forEach(e => e.addEventListener("input", updateDoordruk));
+document.querySelectorAll("#panel-offset input, #panel-offset select").forEach(e => { if (!e.closest(".save-box")) e.addEventListener("input", updateOffset); });
 
 // Instellingen renderen
-const CAT_LABELS = { algemeen: "Algemeen", kleinDrukwerk: "Klein drukwerk", grootFormaat: "Groot formaat", brochure: "Brochures", doordruk: "Doordruksets" };
+const CAT_LABELS = { algemeen: "Algemeen", kleinDrukwerk: "Klein drukwerk", grootFormaat: "Groot formaat", brochure: "Brochures", offset: "Offset", doordruk: "Doordruksets" };
 function renderSettings() {
   const host = $("settings");
   let html = "";
