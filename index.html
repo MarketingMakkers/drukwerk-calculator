@@ -22,9 +22,8 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  header { background: var(--dark); color: #fff; padding: 22px 28px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  header h1 { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: .02em; }
-  header h1 .mm-accent { color: var(--primary); }
+  header { background: var(--dark); color: #fff; padding: 14px 28px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header .mm-logo { height: 52px; width: 52px; display: block; }
   header span { opacity: .75; font-size: 13px; font-weight: 600; }
   .tabs { display: flex; gap: 4px; background: var(--dark); padding: 0 20px; }
   .tab {
@@ -104,7 +103,11 @@
 <body>
 
 <header>
-  <h1>Marketing<span class="mm-accent">Makkers</span></h1>
+  <svg viewBox="0 0 404.9 404.9" class="mm-logo" xmlns="http://www.w3.org/2000/svg" aria-label="MarketingMakkers">
+    <path fill="#F08700" d="M303,90.9H101.9c-6,0-11,4.9-11,10.9V303c0,6,4.9,10.9,11,10.9H303c6,0,10.9-4.9,10.9-10.9v-10.8h30.2V303c0,22.7-18.5,41.2-41.2,41.2h-201c-22.7,0-41.2-18.5-41.2-41.2V101.9c0-22.7,18.5-41.2,41.2-41.2H303c22.7,0,41.2,18.5,41.2,41.2v8.7H314v-8.7C313.9,95.9,309,90.9,303,90.9"/>
+    <path fill="#FFFFFF" d="M313.9,151.6h-23.3v32h-30.2v-32h-23.3v32H207v-51.1c0-6.1,5-11.1,11.1-11.1h115c6.1,0,11.1,5,11.1,11.1v151H314V151.6H313.9z"/>
+    <path fill="#FFFFFF" d="M260.4,222.7h-23.1v60.8h-30.4v-60.8h-23.1v60.8h-30.4v-80c0-6.1,5-11.1,11.1-11.1h115.1c6.1,0,11.1,5,11.1,11.1v80h-30.3L260.4,222.7L260.4,222.7z"/>
+  </svg>
   <span>Drukwerkcalculator — inhouse productie</span>
 </header>
 
@@ -113,6 +116,7 @@
   <button class="tab" data-panel="groot">Groot formaat</button>
   <button class="tab" data-panel="brochure">Brochures</button>
   <button class="tab" data-panel="doordruk">Doordruksets</button>
+  <button class="tab" data-panel="verzamel" id="tab-verzamel">🧺 Verzamelorder</button>
   <button class="tab" data-panel="overzicht">📋 Overzicht</button>
   <button class="tab" data-panel="instellingen">⚙️ Instellingen</button>
 </div>
@@ -124,6 +128,7 @@
   <div class="grid">
     <div class="card">
       <h2>Specificaties</h2>
+      <div class="field"><label>Onderwerp</label><input type="text" id="k-onderwerp" placeholder="Bijv. visitekaartjes Jan, flyer zomeractie"></div>
       <div class="row2">
         <div class="field"><label>Oplage (stuks)</label><input type="number" id="k-oplage" value="1000" min="1"></div>
         <div class="field"><label>Formaat</label>
@@ -168,9 +173,10 @@
       <h2>Calculatie</h2>
       <div id="k-result"></div>
       <div class="save-box" id="save-klein">
-        <div class="row2">
+        <div class="row3">
           <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
           <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
         </div>
         <button class="btn-save" onclick="saveCalc('klein')">💾 Opslaan in overzicht</button>
       </div>
@@ -183,6 +189,7 @@
   <div class="grid">
     <div class="card">
       <h2>Specificaties</h2>
+      <div class="field"><label>Onderwerp</label><input type="text" id="g-onderwerp" placeholder="Bijv. beursbanner, poster actieweken"></div>
       <div class="row3">
         <div class="field"><label>Breedte (cm)</label><input type="number" id="g-breedte" value="100" min="1"></div>
         <div class="field"><label>Hoogte (cm)</label><input type="number" id="g-hoogte" value="200" min="1"></div>
@@ -204,9 +211,10 @@
       <h2>Calculatie</h2>
       <div id="g-result"></div>
       <div class="save-box" id="save-groot">
-        <div class="row2">
+        <div class="row3">
           <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
           <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
         </div>
         <button class="btn-save" onclick="saveCalc('groot')">💾 Opslaan in overzicht</button>
       </div>
@@ -219,6 +227,7 @@
   <div class="grid">
     <div class="card">
       <h2>Specificaties</h2>
+      <div class="field"><label>Onderwerp</label><input type="text" id="b-onderwerp" placeholder="Bijv. brochure najaar, magazine"></div>
       <div class="row3">
         <div class="field"><label>Oplage</label><input type="number" id="b-oplage" value="250" min="1"></div>
         <div class="field"><label>Pagina's (incl. omslag)</label><input type="number" id="b-paginas" value="16" min="8" step="4"></div>
@@ -246,9 +255,10 @@
       <h2>Calculatie</h2>
       <div id="b-result"></div>
       <div class="save-box" id="save-brochure">
-        <div class="row2">
+        <div class="row3">
           <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
           <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
         </div>
         <button class="btn-save" onclick="saveCalc('brochure')">💾 Opslaan in overzicht</button>
       </div>
@@ -261,6 +271,7 @@
   <div class="grid">
     <div class="card">
       <h2>Specificaties</h2>
+      <div class="field"><label>Onderwerp</label><input type="text" id="d-onderwerp" placeholder="Bijv. werkbonnen, orderformulieren"></div>
       <div class="row3">
         <div class="field"><label>Aantal sets</label><input type="number" id="d-sets" value="1000" min="1"></div>
         <div class="field"><label>Formaat</label>
@@ -302,11 +313,37 @@
       <h2>Calculatie</h2>
       <div id="d-result"></div>
       <div class="save-box" id="save-doordruk">
-        <div class="row2">
+        <div class="row3">
           <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
           <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
         </div>
         <button class="btn-save" onclick="saveCalc('doordruk')">💾 Opslaan in overzicht</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ VERZAMELORDER ══════════ -->
+<section class="panel" id="panel-verzamel">
+  <div class="grid">
+    <div class="card">
+      <h2>Items in deze order</h2>
+      <div id="v-items"></div>
+      <label class="check" style="margin-top:14px"><input type="checkbox" id="v-opstart-eenmalig" checked> Opstartkosten eenmalig rekenen (i.p.v. per item)</label>
+      <button class="btn-csv" onclick="clearOrder()" style="margin-top:6px">🗑 Order leegmaken</button>
+      <p class="info">Voeg items toe via de knop "Toevoegen aan verzamelorder" onder een calculatie. Elk item wordt vastgelegd zoals het op dat moment berekend is.</p>
+    </div>
+    <div class="card result" id="v-rechts">
+      <h2>Totaalcalculatie</h2>
+      <div id="v-result"></div>
+      <div class="save-box" id="save-verzamel">
+        <div class="row3">
+          <div class="field"><label>Gemaakt door</label><select class="sb-medewerker"></select></div>
+          <div class="field"><label>Klant</label><input type="text" class="sb-klant" placeholder="Klantnaam"></div>
+          <div class="field"><label>Gripp-nummer</label><input type="text" class="sb-gripp" placeholder="Bijv. 2026-0341"></div>
+        </div>
+        <button class="btn-save" onclick="saveCalc('verzamel')">💾 Opslaan in overzicht</button>
       </div>
     </div>
   </div>
@@ -514,7 +551,8 @@ function finish({ regels, aantal }) {
 }
 /* ═════════════════ EINDE REKENFUNCTIES ═════════════════ */
 
-const PRODUCT_LABELS = { klein: "Klein drukwerk", groot: "Groot formaat", brochure: "Brochure", doordruk: "Doordruksets" };
+const PRODUCT_LABELS = { klein: "Klein drukwerk", groot: "Groot formaat", brochure: "Brochure", doordruk: "Doordruksets", verzamel: "Verzamelorder" };
+const ADDABLE = ["klein", "groot", "brochure", "doordruk"];
 const LAST = {}; // laatste calculatie + specs per tabblad
 
 function renderResult(el, r, tab, specs) {
@@ -530,10 +568,79 @@ function renderResult(el, r, tab, specs) {
     <div class="per">${euro(r.perStuk)} per ${eenheid} (excl. btw) · ${r.aantal.toLocaleString("nl-NL")} ${eenheid}s${r.subInfo ? " · " + r.subInfo : ""}</div>
     <div class="incl">Incl. ${v("algemeen","btw")}% btw: ${euro(r.verkoopIncl)}</div></div>`;
   if (tab) html += `<button class="btn-pdf" onclick="downloadPDF('${tab}')">⬇&nbsp; Download als PDF</button>`;
+  if (tab && ADDABLE.includes(tab)) html += `<button class="btn-save" style="margin-top:8px" onclick="addToOrder('${tab}')">🧺 Toevoegen aan verzamelorder</button>`;
   el.innerHTML = html;
 }
 
+/* ═════════════════ VERZAMELORDER ═════════════════ */
+const ORDER = [];
+
+function addToOrder(tab) {
+  const { r, specs } = LAST[tab];
+  const ond = getOnderwerp(specs);
+  const kort = specs.filter(s => s[0] !== "Onderwerp").slice(0, 3).map(s => s[1]).join(", ");
+  ORDER.push({
+    product: PRODUCT_LABELS[tab],
+    omschrijving: (ond ? ond + " (" + PRODUCT_LABELS[tab] + ")" : PRODUCT_LABELS[tab]) + " — " + kort,
+    specs: JSON.parse(JSON.stringify(specs)),
+    r: JSON.parse(JSON.stringify(r)),
+  });
+  renderOrder();
+  const badge = ORDER.length;
+  $("tab-verzamel").textContent = "🧺 Verzamelorder (" + badge + ")";
+  const btn = event.target, orig = btn.textContent;
+  btn.textContent = "✔ Toegevoegd (item " + badge + ")";
+  setTimeout(() => { btn.textContent = orig; }, 2000);
+}
+
+function removeOrderItem(i) {
+  ORDER.splice(i, 1);
+  $("tab-verzamel").textContent = ORDER.length ? "🧺 Verzamelorder (" + ORDER.length + ")" : "🧺 Verzamelorder";
+  renderOrder();
+}
+
+function clearOrder() {
+  if (ORDER.length && !confirm("Alle items uit de verzamelorder verwijderen?")) return;
+  ORDER.length = 0;
+  $("tab-verzamel").textContent = "🧺 Verzamelorder";
+  renderOrder();
+}
+
+function calcVerzamel() {
+  const regels = ORDER.map((it, i) => [(i + 1) + ". " + it.omschrijving, it.r.kostprijs]);
+  if ($("v-opstart-eenmalig").checked && ORDER.length > 1) {
+    const korting = (ORDER.length - 1) * v("algemeen", "opstart");
+    regels.push(["Correctie: opstartkosten eenmalig (" + (ORDER.length - 1) + "× vervallen)", -korting]);
+  }
+  const r = finish({ regels, aantal: 1 });
+  r.eenheid = "order";
+  r.subInfo = ORDER.length + (ORDER.length === 1 ? " item" : " items");
+  return r;
+}
+
+function renderOrder() {
+  const host = $("v-items");
+  if (ORDER.length === 0) {
+    host.innerHTML = '<p class="db-leeg">Nog geen items toegevoegd.</p>';
+    $("v-result").innerHTML = '<p class="db-leeg">Voeg minimaal één item toe voor een totaalcalculatie.</p>';
+    $("save-verzamel").style.display = "none";
+    return;
+  }
+  $("save-verzamel").style.display = "";
+  let html = '<table class="db-table"><tr><th>#</th><th>Item</th><th style="text-align:right">Kostprijs</th><th></th></tr>';
+  ORDER.forEach((it, i) => {
+    html += `<tr><td>${i + 1}</td><td>${escapeHtml(it.omschrijving)}</td>
+      <td class="num">${euro(it.r.kostprijs)}</td>
+      <td style="text-align:right"><button class="btn-mini" onclick="removeOrderItem(${i})" title="Verwijderen">✕</button></td></tr>`;
+  });
+  host.innerHTML = html + "</table>";
+  const specs = ORDER.map((it, i) => ["Item " + (i + 1) + " — " + it.product, it.specs.slice(0, 4).map(s => s[1]).join(", ")]);
+  renderResult($("v-result"), calcVerzamel(), "verzamel", specs);
+}
+
 /* ═════════════════ PDF EXPORT ═════════════════ */
+const LOGO_PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABmJLR0QA/wD/AP+gvaeTAAAIe0lEQVR4nO3dW4ycZR3H8e8zS7clhe62HATBAMHQ4gV6YQhpxGh7YSIxkRsS8IJTlAuFlJoetgKZBLq0cpAQIyFKaFViUq/0wugF4RQgYgAPFy2K0hANFaXdWY7dbefvxbYBtX3aeefded7tfj/X8zzPr9v5zTzvYWZAkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkiRJkqRjS+kAvZocZ0W0WB1dVtJiBcF5wAhwUulsWiWmgEmC3ZHY1YLnU4vHl2zgldLBejEnCvJmm1MWLOLGFNwAXFI6j/qQ+H3AtukPeOTMNu+UjnMsjS5ItBnuLGItXdaRWFY6j2r1FsF3R6Z4ILWZKh3maBpbkM5WLosu24DlpbNoVu1MLa4b2cALpYMcSat0gCPZN86a6PI0lmM+uDi6PNMZ55bSQY6kUe8gEaTJLdwXcGvpLCrivpGNrEuJKB3ksEYV5NAB+dPAgtJZVNRUanF5Uw7ci7+DRJvh6PIolkMfGo4uP4kHWVg6SPGCdBaxFlhROoca46LOu+XPbBXdYu25h8WLDrAbOL1kDjXWW9MtLjhjA2+XClD0HWThNF/HcujoTjtp5vaiYooWJCWuK7m+mi8F1xZdv9TCk+Os6CZ21jTdFPBPYLqm+dSfBcDHgOE6JmsFy5ds4s91zNWrYreIR2JV/5Pwmy5sXvpJnktXcbCGWKpJ7GBo4i98Pg1xO8EX+5mr22I1zLOCdGFln29fm0fGuL1JtyXoQ4desJ6INk9NLOR7iepnpCJYCTxUX7rjV+wYJPV3avdXo2PcZjmaL7Xpju7n1gTPVJ4jyl0GKHmQfl7Vga1gvM4gml2pTTfgruoTcH59aXpTsiBLKo7bf+oUz9eaRLNuZBlPAAcqDq/6XOlbkYLEDoaoeIYjYG9q0605kmZZuolp4N8Vhw9Hu8zxcpl3kH3V123hccdcleijxe2s8tckit+LJTWZBZEyylwHeYMofyOzBi0SPyUYrTR4aZnjzjIFOZvE3iIrq6DRjWwonaFXbrGkDAsiZVgQKcOCSBl+4fMcEhHDwOLSOWbZ/pTSe6VDHGZBGi4ilgEbgKug3D1JgxQRe4FfA3ellOr6zFAlbrEaLCIuAl4C1jNPynHIMuAa4KWIuLJkEAvSUIe2U78ANWpuAAAB4UlEQVSgj7ueTwCLgMciothnhixIc12NX4cEcDKwqdTiFqS5vlQ6QIMU+1tYkOY6q3SABjkzIoZKLGxBmsv/mw8lCv09/E+QMiyIlGFBpAwLImVYECnDgkgZ3s17Ynqd4/+StlOBMyquM0Gd39EWMSml/n0jixOOBTkxXZ5Sev14HhgR1wGPVlzn9pTS1uN9cET8A/h4xbWKcYslZVgQKcOCSBkWRMqwIFKGBZEyLIiUYUGkDAsiZVgQKcOCSBkWRMqwIFKGBZEyvN29uZ4E3qw4tpefD9gN/LziOn+sOG7OsCANlVJqD2idJ5kpo47ALZaUYUGkDAsiZXgMUlFEfBZYC1zOif+7gTDzJRC7gG3A9pTSwbJxBsOCVBARtwD3M8feoaMGZzDzgnBNRHw1pfRO6UCzzS1WjyLiCuAB5l85Pmo18HDpEINgQXq3mZnfq5jvro6IS0qHmG0WpAcRcS7w6dI5GiIBV5QOMdssSG/OKR2gYc4tHWC2WZDezOfjjiM54f8eFkTKsCBShgWRMiyIlGFBpAwLImVYECnDgkgZFqRHUToAL/Sx1mU9rHN9//8Uzai4pAwLImVYECnDgkgZFkTKsCBShgWRMiyIlGFBpAwLImVYECnDgkgZFkTKsCBShgWRJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJKlx/gPuc8Xm5jkY1AAAAABJRU5ErkJggg==";
+
 function downloadPDF(tab) {
   const box = $("save-" + tab);
   buildPDF({
@@ -541,6 +648,7 @@ function downloadPDF(tab) {
     ...LAST[tab],
     klant: box.querySelector(".sb-klant").value.trim(),
     medewerker: box.querySelector(".sb-medewerker").value,
+    gripp: box.querySelector(".sb-gripp").value.trim(),
     id: null,
     datum: new Date(),
   });
@@ -548,10 +656,10 @@ function downloadPDF(tab) {
 
 function pdfRecord(recId) {
   const rec = DB_CACHE.find(x => x.id === recId);
-  if (rec) buildPDF({ product: rec.product, r: rec.r, specs: rec.specs, klant: rec.klant, medewerker: rec.medewerker, id: rec.id, datum: new Date(rec.datum) });
+  if (rec) buildPDF({ product: rec.product, r: rec.r, specs: rec.specs, klant: rec.klant, medewerker: rec.medewerker, gripp: rec.gripp || "", id: rec.id, datum: new Date(rec.datum) });
 }
 
-function buildPDF({ product, r, specs, klant, medewerker, id, datum }) {
+function buildPDF({ product, r, specs, klant, medewerker, gripp, id, datum }) {
   if (!window.jspdf) { alert("PDF-bibliotheek kon niet geladen worden. Controleer je internetverbinding en herlaad de pagina."); return; }
   const doc = new window.jspdf.jsPDF();
   const W = 210, M = 16, R = W - M;
@@ -560,16 +668,18 @@ function buildPDF({ product, r, specs, klant, medewerker, id, datum }) {
 
   // Header
   doc.setFillColor(...dark); doc.rect(0, 0, W, 30, "F");
+  try { doc.addImage(LOGO_PNG, "PNG", M, 6, 18, 18); } catch (e) { /* logo overslaan bij fout */ }
   doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(255, 255, 255);
-  doc.text("MARKETING", M, 13);
-  doc.setTextColor(...orange); doc.text("MAKKERS", M + doc.getTextWidth("MARKETING"), 13);
+  doc.text("MARKETING", M + 23, 14);
+  doc.setTextColor(...orange); doc.text("MAKKERS", M + 23 + doc.getTextWidth("MARKETING"), 14);
   doc.setFontSize(9); doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "normal");
-  doc.text("Drukwerkcalculatie — " + product + (id ? "  ·  Ref. " + id : ""), M, 21);
+  doc.text("Drukwerkcalculatie — " + product + (id ? "  ·  Ref. " + id : ""), M + 23, 21);
   doc.text(datumStr, R, 21, { align: "right" });
 
-  // Specificaties (incl. klant/medewerker/referentie)
+  // Specificaties (incl. klant/medewerker/gripp/referentie)
   const meta = [];
   if (id) meta.push(["Referentie", id]);
+  if (gripp) meta.push(["Gripp-nummer", gripp]);
   if (klant) meta.push(["Klant", klant]);
   if (medewerker) meta.push(["Gemaakt door", medewerker]);
   let y = 44;
@@ -580,8 +690,10 @@ function buildPDF({ product, r, specs, klant, medewerker, id, datum }) {
   doc.setFontSize(9);
   for (const [label, val] of meta.concat(specs)) {
     doc.setFont("helvetica", "normal"); doc.setTextColor(...grey); doc.text(label, M, y);
-    doc.setFont("helvetica", "bold"); doc.setTextColor(...dark); doc.text(String(val), M + 55, y);
-    y += 6;
+    doc.setFont("helvetica", "bold"); doc.setTextColor(...dark);
+    const lines = doc.splitTextToSize(String(val), R - (M + 55));
+    doc.text(lines, M + 55, y);
+    y += 5.5 * lines.length + 0.5;
   }
 
   // Calculatie
@@ -593,10 +705,12 @@ function buildPDF({ product, r, specs, klant, medewerker, id, datum }) {
   const rij = (label, bedrag, opts = {}) => {
     doc.setFont("helvetica", opts.bold ? "bold" : "normal");
     doc.setTextColor(...(opts.muted ? grey : dark));
-    doc.text(label, M, y);
+    const lines = doc.splitTextToSize(label, R - M - 35);
+    doc.text(lines, M, y);
     doc.text(bedrag, R, y, { align: "right" });
-    if (!opts.noLine) { doc.setDrawColor(...line); doc.line(M, y + 2, R, y + 2); }
-    y += 7;
+    const h = 5.5 * (lines.length - 1);
+    if (!opts.noLine) { doc.setDrawColor(...line); doc.line(M, y + h + 2, R, y + h + 2); }
+    y += 7 + h;
   };
   for (const [label, bedrag] of r.regels) rij(label, euro(bedrag));
   rij("Kostprijs", euro(r.kostprijs), { bold: true });
@@ -672,6 +786,8 @@ async function saveCalc(tab) {
     datum: new Date().toISOString(),
     tab, product: PRODUCT_LABELS[tab],
     medewerker: box.querySelector(".sb-medewerker").value,
+    gripp: box.querySelector(".sb-gripp").value.trim(),
+    onderwerp: getOnderwerp(specs),
     klant, specs,
     r: { regels: r.regels, kostprijs: r.kostprijs, margePct: r.margePct, marge: r.marge,
          verkoopEx: r.verkoopEx, verkoopIncl: r.verkoopIncl, perStuk: r.perStuk,
@@ -721,7 +837,7 @@ function renderOverzicht() {
   const q = ($("db-zoek").value || "").toLowerCase().trim();
   const db = DB_CACHE.filter(rec => {
     if (!q) return true;
-    const blob = [rec.id, rec.klant, rec.medewerker, rec.product,
+    const blob = [rec.id, rec.klant, rec.medewerker, rec.product, rec.gripp || "", rec.onderwerp || "",
       new Date(rec.datum).toLocaleDateString("nl-NL"),
       ...rec.specs.map(s => s.join(" "))].join(" ").toLowerCase();
     return q.split(/\s+/).every(term => blob.includes(term));
@@ -731,12 +847,14 @@ function renderOverzicht() {
     host.innerHTML = `<p class="db-leeg">${q ? "Geen records gevonden voor deze zoekopdracht." : "Nog geen calculaties opgeslagen. Maak een calculatie en klik op 'Opslaan in overzicht'."}</p>`;
     return;
   }
-  let html = `<table class="db-table"><tr><th>Ref.</th><th>Datum</th><th>Product</th><th>Klant</th><th>Gemaakt door</th><th style="text-align:right">Prijs excl. btw</th><th></th></tr>`;
+  let html = `<table class="db-table"><tr><th>Ref.</th><th>Gripp</th><th>Datum</th><th>Product</th><th>Onderwerp</th><th>Klant</th><th>Gemaakt door</th><th style="text-align:right">Prijs excl. btw</th><th></th></tr>`;
   for (const rec of db) {
     html += `<tr>
       <td class="rec-id">${rec.id}</td>
+      <td>${escapeHtml(rec.gripp || "—")}</td>
       <td>${new Date(rec.datum).toLocaleDateString("nl-NL")}</td>
       <td>${escapeHtml(rec.product)}</td>
+      <td>${escapeHtml(rec.onderwerp || "—")}</td>
       <td>${escapeHtml(rec.klant)}</td>
       <td>${escapeHtml(rec.medewerker)}</td>
       <td class="num">${euro(rec.r.verkoopEx)}</td>
@@ -753,9 +871,9 @@ function exportCSV() {
   if (db.length === 0) { alert("Nog geen records om te exporteren."); return; }
   const num = n => n.toFixed(2).replace(".", ",");
   const esc = s => '"' + String(s).replace(/"/g, '""') + '"';
-  let csv = "Referentie;Datum;Product;Klant;Gemaakt door;Aantal;Specificaties;Kostprijs;Verkoop excl. btw;Verkoop incl. btw\n";
+  let csv = "Referentie;Gripp-nummer;Datum;Product;Onderwerp;Klant;Gemaakt door;Aantal;Specificaties;Kostprijs;Verkoop excl. btw;Verkoop incl. btw\n";
   for (const rec of db) {
-    csv += [rec.id, new Date(rec.datum).toLocaleDateString("nl-NL"), esc(rec.product), esc(rec.klant), esc(rec.medewerker),
+    csv += [rec.id, esc(rec.gripp || ""), new Date(rec.datum).toLocaleDateString("nl-NL"), esc(rec.product), esc(rec.onderwerp || ""), esc(rec.klant), esc(rec.medewerker),
       rec.r.aantal, esc(rec.specs.map(s => s[0] + ": " + s[1]).join(" | ")),
       num(rec.r.kostprijs), num(rec.r.verkoopEx), num(rec.r.verkoopIncl)].join(";") + "\n";
   }
@@ -791,9 +909,12 @@ $("g-materiaal").value = "banner";
 const papierPrijs = id => PAPIER.find(p => p.id === id).prijs;
 const selText = id => { const s = $(id); return s.options[s.selectedIndex].text.split(" — ")[0]; };
 const jaNee = b => b ? "Ja" : "Nee";
+const onderwerpSpec = id => { const w = ($(id).value || "").trim(); return w ? [["Onderwerp", w]] : []; };
+const getOnderwerp = specs => { const s = specs.find(x => x[0] === "Onderwerp"); return s ? s[1] : ""; };
 
 function updateKlein() {
   const specs = [
+    ...onderwerpSpec("k-onderwerp"),
     ["Oplage", (+$("k-oplage").value || 1).toLocaleString("nl-NL") + " stuks"],
     ["Formaat", selText("k-formaat")],
     ["Papier", selText("k-papier")],
@@ -813,6 +934,7 @@ function updateKlein() {
 }
 function updateGroot() {
   const specs = [
+    ...onderwerpSpec("g-onderwerp"),
     ["Afmeting", $("g-breedte").value + " × " + $("g-hoogte").value + " cm"],
     ["Aantal", (+$("g-aantal").value || 1).toLocaleString("nl-NL") + " stuks"],
     ["Materiaal", selText("g-materiaal")],
@@ -831,6 +953,7 @@ function updateGroot() {
 function updateBrochure() {
   let pag = Math.max(8, Math.round((+$("b-paginas").value || 8) / 4) * 4);
   const specs = [
+    ...onderwerpSpec("b-onderwerp"),
     ["Oplage", (+$("b-oplage").value || 1).toLocaleString("nl-NL") + " boekjes"],
     ["Pagina's", pag + " (incl. omslag)"],
     ["Formaat", selText("b-formaat")],
@@ -851,6 +974,7 @@ function updateBrochure() {
 }
 function updateDoordruk() {
   const specs = [
+    ...onderwerpSpec("d-onderwerp"),
     ["Aantal sets", (+$("d-sets").value || 1).toLocaleString("nl-NL")],
     ["Formaat", selText("d-formaat")],
     ["Voud", selText("d-voud")],
@@ -918,12 +1042,14 @@ function refreshMateriaal() {
 // Medewerker-dropdowns vullen + overzicht initialiseren
 document.querySelectorAll(".sb-medewerker").forEach(s => s.innerHTML = MEDEWERKERS.map(m => `<option>${m}</option>`).join(""));
 $("db-zoek").addEventListener("input", renderOverzicht);
+$("v-opstart-eenmalig").addEventListener("input", renderOrder);
 $("db-info").textContent = CLOUD_URL
   ? "Gedeelde database actief (Google Sheets): alle collega's zien en gebruiken dezelfde lijst."
   : "Let op: er is nog geen gedeelde database gekoppeld. Records worden opgeslagen in de browser op deze computer; collega's zien deze lijst niet. Zie INSTRUCTIES-GOOGLE-SHEETS.md om de koppeling te activeren.";
 
 renderSettings();
 updateAll();
+renderOrder();
 reloadOverzicht();
 </script>
 </body>
