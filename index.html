@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketingMakkers — Drukwerk Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #F08700;        /* MarketingMakkers oranje */
+    --primary-dark: #d67800;
+    --dark: #1D1D1B;           /* antraciet */
+    --accent: #F08700;
+    --bg: #ECECEC;             /* lichtgrijs uit huisstijl */
+    --card: #ffffff;
+    --text: #1D1D1B;
+    --muted: #6b6b68;
+    --border: #D9D9D9;
+    --green: #059669;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  header { background: var(--dark); color: #fff; padding: 22px 28px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  header h1 { font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: .02em; }
+  header h1 .mm-accent { color: var(--primary); }
+  header span { opacity: .75; font-size: 13px; font-weight: 600; }
+  .tabs { display: flex; gap: 4px; background: var(--dark); padding: 0 20px; }
+  .tab {
+    background: rgba(255,255,255,.10); color: #fff; border: none; padding: 11px 20px;
+    border-radius: 8px 8px 0 0; cursor: pointer; font-size: 13px; font-weight: 700;
+    font-family: inherit; text-transform: uppercase; letter-spacing: .03em;
+  }
+  .tab:hover { background: rgba(255,255,255,.2); }
+  .tab.active { background: var(--primary); color: #fff; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card h2 { font-size: 14px; font-weight: 800; margin-bottom: 14px; color: var(--dark); text-transform: uppercase; letter-spacing: .05em; }
+  .card h2::after { content: ""; display: block; width: 34px; height: 3px; background: var(--primary); margin-top: 5px; border-radius: 2px; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--muted); }
+  .field input, .field select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; background: #fff; color: var(--text);
+  }
+  .field input, .field select { font-family: inherit; }
+  .field input:focus, .field select:focus { outline: 2px solid var(--primary); border-color: transparent; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 10px; }
+  .check input { width: 16px; height: 16px; }
+  /* Result panel */
+  .result table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .result td { padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .result td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .result tr.total td { border-top: 2px solid var(--text); border-bottom: none; font-weight: 700; padding-top: 10px; }
+  .result tr.sub td { color: var(--muted); font-size: 13px; }
+  .price-big { margin-top: 16px; background: var(--dark); color: #fff; border-radius: 10px; padding: 16px; text-align: center; }
+  .price-big .amount { font-size: 30px; font-weight: 900; color: var(--primary); }
+  .price-big .per { font-size: 13px; opacity: .85; margin-top: 4px; }
+  .price-big .incl { font-size: 12px; opacity: .7; margin-top: 2px; }
+  .info { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+  /* Settings */
+  .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .settings-grid h3 { font-size: 13px; font-weight: 800; margin: 6px 0 10px; color: var(--primary); text-transform: uppercase; letter-spacing: .04em; }
+  .set-row input { font-family: inherit; }
+  .set-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .set-row input { width: 90px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; text-align: right; font-size: 13px; }
+  .note { background: #fdf1e0; border: 1px solid #f5c98a; border-left: 4px solid var(--primary); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #7a4a08; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Marketing<span class="mm-accent">Makkers</span></h1>
+  <span>Drukwerkcalculator — inhouse productie</span>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-panel="klein">Klein drukwerk</button>
+  <button class="tab" data-panel="groot">Groot formaat</button>
+  <button class="tab" data-panel="brochure">Brochures</button>
+  <button class="tab" data-panel="doordruk">Doordruksets</button>
+  <button class="tab" data-panel="instellingen">⚙️ Instellingen</button>
+</div>
+
+<main>
+
+<!-- ══════════ KLEIN DRUKWERK ══════════ -->
+<section class="panel active" id="panel-klein">
+  <div class="grid">
+    <div class="card">
+      <h2>Specificaties</h2>
+      <div class="row2">
+        <div class="field"><label>Oplage (stuks)</label><input type="number" id="k-oplage" value="1000" min="1"></div>
+        <div class="field"><label>Formaat</label>
+          <select id="k-formaat">
+            <option value="vk">Visitekaartje 85×55</option>
+            <option value="a6">A6 (105×148)</option>
+            <option value="a5" selected>A5 (148×210)</option>
+            <option value="dl">DL (99×210)</option>
+            <option value="a4">A4 (210×297)</option>
+            <option value="a3">A3 (297×420)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Papier</label><select id="k-papier"></select></div>
+        <div class="field"><label>Bedrukking</label>
+          <select id="k-zijden">
+            <option value="1">Enkelzijdig</option>
+            <option value="2" selected>Dubbelzijdig</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Kleur</label>
+          <select id="k-kleur">
+            <option value="kleur" selected>Full colour</option>
+            <option value="zwart">Zwart-wit</option>
+          </select>
+        </div>
+        <div class="field"><label>Vouwen</label>
+          <select id="k-vouwen">
+            <option value="0" selected>Niet vouwen</option>
+            <option value="1">1× vouwen</option>
+            <option value="2">2× vouwen (wikkel/zigzag)</option>
+          </select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="k-proef"> Proefdruk vooraf</label>
+      <p class="info">Berekening op basis van SRA3-vellen (digitale pers). Aantal per vel: visitekaartje 21×, A6 8×, A5 4×, DL 6×, A4 2×, A3 1×. Inschiet en tarieven pas je aan onder Instellingen.</p>
+    </div>
+    <div class="card result">
+      <h2>Calculatie</h2>
+      <div id="k-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GROOT FORMAAT ══════════ -->
+<section class="panel" id="panel-groot">
+  <div class="grid">
+    <div class="card">
+      <h2>Specificaties</h2>
+      <div class="row3">
+        <div class="field"><label>Breedte (cm)</label><input type="number" id="g-breedte" value="100" min="1"></div>
+        <div class="field"><label>Hoogte (cm)</label><input type="number" id="g-hoogte" value="200" min="1"></div>
+        <div class="field"><label>Aantal</label><input type="number" id="g-aantal" value="1" min="1"></div>
+      </div>
+      <div class="field"><label>Materiaal</label><select id="g-materiaal"></select></div>
+      <div class="field"><label>Afwerking</label>
+        <select id="g-afwerking">
+          <option value="snijden" selected>Schoonsnijden</option>
+          <option value="geen">Geen</option>
+          <option value="zomen">Zomen + ringen (banners)</option>
+          <option value="laminaat">Lamineren + snijden</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" id="g-proef"> Proefdruk / kleurproef</label>
+      <p class="info">Prijs per m² op basis van materiaal + inkt. Zomen/ringen wordt berekend per strekkende meter omtrek, laminaat per m².</p>
+    </div>
+    <div class="card result">
+      <h2>Calculatie</h2>
+      <div id="g-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BROCHURES ══════════ -->
+<section class="panel" id="panel-brochure">
+  <div class="grid">
+    <div class="card">
+      <h2>Specificaties</h2>
+      <div class="row3">
+        <div class="field"><label>Oplage</label><input type="number" id="b-oplage" value="250" min="1"></div>
+        <div class="field"><label>Pagina's (incl. omslag)</label><input type="number" id="b-paginas" value="16" min="8" step="4"></div>
+        <div class="field"><label>Formaat</label>
+          <select id="b-formaat">
+            <option value="a5" selected>A5</option>
+            <option value="a4">A4</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Papier binnenwerk</label><select id="b-papier-bin"></select></div>
+        <div class="field"><label>Papier omslag</label><select id="b-papier-oms"></select></div>
+      </div>
+      <div class="field"><label>Bindwijze</label>
+        <select id="b-binding">
+          <option value="niet" selected>Geniet (2 nietjes)</option>
+          <option value="lijm">Gelijmd (softcover)</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" id="b-proef" checked> Proefexemplaar</label>
+      <p class="info">Pagina's moeten een veelvoud van 4 zijn. Binnenwerk en omslag full colour dubbelzijdig op SRA3; A5-boekje = 8 pagina's per vel, A4-boekje = 4 pagina's per vel.</p>
+    </div>
+    <div class="card result">
+      <h2>Calculatie</h2>
+      <div id="b-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DOORDRUKSETS ══════════ -->
+<section class="panel" id="panel-doordruk">
+  <div class="grid">
+    <div class="card">
+      <h2>Specificaties</h2>
+      <div class="row3">
+        <div class="field"><label>Aantal sets</label><input type="number" id="d-sets" value="1000" min="1"></div>
+        <div class="field"><label>Formaat</label>
+          <select id="d-formaat">
+            <option value="a6">A6 (105×148)</option>
+            <option value="a5">A5 (148×210)</option>
+            <option value="dl">DL (99×210)</option>
+            <option value="a4" selected>A4 (210×297)</option>
+          </select>
+        </div>
+        <div class="field"><label>Voud</label>
+          <select id="d-voud">
+            <option value="2" selected>2-voud (wit/geel)</option>
+            <option value="3">3-voud (wit/geel/roze)</option>
+            <option value="4">4-voud (wit/geel/roze/groen)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Sets per blok</label><input type="number" id="d-setsperblok" value="50" min="1"></div>
+        <div class="field"><label>Bedrukking</label>
+          <select id="d-zijden">
+            <option value="1" selected>Enkelzijdig</option>
+            <option value="2">Dubbelzijdig</option>
+          </select>
+        </div>
+        <div class="field"><label>Kleur</label>
+          <select id="d-kleur">
+            <option value="zwart" selected>Zwart-wit</option>
+            <option value="kleur">Full colour</option>
+          </select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" id="d-nummeren"> Doornummeren</label>
+      <label class="check"><input type="checkbox" id="d-proef"> Proefdruk vooraf</label>
+      <p class="info">Zelfdoorschrijvend (NCR) papier op SRA3, gelijmd tot blokken met grijsbord achterkant. NCR-velprijs, grijsbord- en lijmkosten pas je aan onder Instellingen.</p>
+    </div>
+    <div class="card result">
+      <h2>Calculatie</h2>
+      <div id="d-result"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ INSTELLINGEN ══════════ -->
+<section class="panel" id="panel-instellingen">
+  <div class="note">⚠️ Dit zijn richtprijzen. Pas ze aan naar jullie werkelijke kosten — alle calculaties worden direct herberekend. <strong>Let op:</strong> wijzigingen gelden alleen voor deze sessie; permanente aanpassingen kun je in het bestand (laten) zetten.</div>
+  <div class="card">
+    <div class="settings-grid" id="settings"></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ═════════════════ INSTELLINGEN (richtprijzen) ═════════════════ */
+const S = {
+  algemeen: {
+    uurtarief:      { label: "Uurtarief machine + operator (€/u)", value: 55 },
+    marge:          { label: "Winstmarge (%)", value: 40 },
+    opstart:        { label: "Opstartkosten per order (€)", value: 15 },
+    proefdruk:      { label: "Proefdruk (€)", value: 7.50 },
+    btw:            { label: "BTW (%)", value: 21 },
+  },
+  kleinDrukwerk: {
+    inschiet:       { label: "Inschiet / marge vellen (%)", value: 5 },
+    klikKleur:      { label: "Klikprijs kleur per zijde (€)", value: 0.035 },
+    klikZwart:      { label: "Klikprijs zwart per zijde (€)", value: 0.008 },
+    printSnelheid:  { label: "Printsnelheid (vellen/uur)", value: 2000 },
+    snijtijdBasis:  { label: "Snijden: basistijd (min)", value: 10 },
+    snijtijdPer1000:{ label: "Snijden: min per 1.000 vel", value: 8 },
+    vouwPer1000:    { label: "Vouwen: min per 1.000 stuks", value: 20 },
+  },
+  grootFormaat: {
+    inschietG:      { label: "Inschiet materiaal (%)", value: 5 },
+    inktM2:         { label: "Inktkosten per m² (€)", value: 1.50 },
+    printM2PerUur:  { label: "Printsnelheid (m²/uur)", value: 8 },
+    laminaatM2:     { label: "Laminaat per m² (€)", value: 4.00 },
+    zoomPerMeter:   { label: "Zomen + ringen per m (€)", value: 2.00 },
+    snijMinPerStuk: { label: "Snijden/afwerken min per stuk", value: 4 },
+  },
+  brochure: {
+    nietjes:        { label: "Nietjes per boekje (€)", value: 0.02 },
+    lijm:           { label: "Lijmbinding per boekje (€)", value: 0.45 },
+    afwerkPerUur:   { label: "Vergaren/binden (boekjes/uur)", value: 120 },
+  },
+  doordruk: {
+    ncrVel:         { label: "NCR-papier per SRA3-vel (€)", value: 0.09 },
+    grijsbord:      { label: "Grijsbord per blok (€)", value: 0.15 },
+    lijmBlok:       { label: "Bloklijm per blok (€)", value: 0.08 },
+    blokkenPerUur:  { label: "Lijmen/blokken maken (blokken/uur)", value: 40 },
+    nummerPerSet:   { label: "Doornummeren per set (€)", value: 0.02 },
+  },
+};
+
+/* Papier: prijs per SRA3-vel */
+const PAPIER = [
+  { id: "off90",  label: "Offset 90 g",        prijs: 0.04 },
+  { id: "mc135",  label: "Mat mc 135 g",       prijs: 0.06 },
+  { id: "mc170",  label: "Mat mc 170 g",       prijs: 0.08 },
+  { id: "mc250",  label: "Mat mc 250 g",       prijs: 0.12 },
+  { id: "mc300",  label: "Mat mc 300 g",       prijs: 0.15 },
+  { id: "bio300", label: "Biotop 300 g",       prijs: 0.18 },
+];
+
+/* Groot formaat: prijs per m² */
+const MATERIAAL = [
+  { id: "poster",  label: "Posterpapier 200 g",     prijs: 2.50 },
+  { id: "vinyl",   label: "Vinyl zelfklevend",      prijs: 5.00 },
+  { id: "banner",  label: "Banner PVC 510 g",       prijs: 6.00 },
+  { id: "rollup",  label: "Roll-up film",           prijs: 8.00 },
+  { id: "canvas",  label: "Canvas 340 g",           prijs: 12.00 },
+  { id: "backlit", label: "Backlit film",           prijs: 9.00 },
+];
+
+/* Aantal stuks per SRA3-vel per formaat */
+const UPS = { vk: 21, a6: 8, a5: 4, dl: 6, a4: 2, a3: 1 };
+
+/* ═════════════════ PURE REKENFUNCTIES ═════════════════ */
+function euro(n) { return "€ " + n.toLocaleString("nl-NL", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function v(cat, key) { return S[cat][key].value; }
+
+function calcKlein(inp) {
+  const ups = UPS[inp.formaat];
+  const nettoVellen = Math.ceil(inp.oplage / ups);
+  const vellen = Math.ceil(nettoVellen * (1 + v("kleinDrukwerk", "inschiet") / 100));
+  const papier = vellen * inp.papierPrijs;
+  const klikPrijs = inp.kleur === "kleur" ? v("kleinDrukwerk", "klikKleur") : v("kleinDrukwerk", "klikZwart");
+  const klik = vellen * inp.zijden * klikPrijs;
+  const printMin = (vellen / v("kleinDrukwerk", "printSnelheid")) * 60;
+  const snijMin = v("kleinDrukwerk", "snijtijdBasis") + (vellen / 1000) * v("kleinDrukwerk", "snijtijdPer1000");
+  const vouwMin = inp.vouwen > 0 ? (inp.oplage / 1000) * v("kleinDrukwerk", "vouwPer1000") * inp.vouwen : 0;
+  const arbeidMin = printMin + snijMin + vouwMin;
+  const arbeid = (arbeidMin / 60) * v("algemeen", "uurtarief");
+  const opstart = v("algemeen", "opstart") + (inp.proef ? v("algemeen", "proefdruk") : 0);
+  return finish({ regels: [
+    ["Papier (" + vellen + " vel SRA3, incl. inschiet)", papier],
+    ["Klik-/inktkosten (" + (vellen * inp.zijden) + " zijden)", klik],
+    ["Arbeid & machine (" + Math.round(arbeidMin) + " min)", arbeid],
+    ["Opstartkosten" + (inp.proef ? " + proefdruk" : ""), opstart],
+  ], aantal: inp.oplage });
+}
+
+function calcGroot(inp) {
+  const m2PerStuk = (inp.breedte * inp.hoogte) / 10000;
+  const m2 = m2PerStuk * inp.aantal;
+  const m2Bruto = m2 * (1 + v("grootFormaat", "inschietG") / 100);
+  const materiaal = m2Bruto * inp.materiaalPrijs;
+  const inkt = m2 * v("grootFormaat", "inktM2");
+  let afwerkKosten = 0, afwerkLabel = "Afwerking";
+  const omtrekM = 2 * (inp.breedte + inp.hoogte) / 100 * inp.aantal;
+  if (inp.afwerking === "zomen") { afwerkKosten = omtrekM * v("grootFormaat", "zoomPerMeter"); afwerkLabel = "Zomen + ringen (" + omtrekM.toFixed(1) + " m)"; }
+  if (inp.afwerking === "laminaat") { afwerkKosten = m2 * v("grootFormaat", "laminaatM2"); afwerkLabel = "Laminaat (" + m2.toFixed(2) + " m²)"; }
+  const printMin = (m2 / v("grootFormaat", "printM2PerUur")) * 60;
+  const snijMin = inp.afwerking === "geen" ? 0 : inp.aantal * v("grootFormaat", "snijMinPerStuk");
+  const arbeid = ((printMin + snijMin) / 60) * v("algemeen", "uurtarief");
+  const opstart = v("algemeen", "opstart") + (inp.proef ? v("algemeen", "proefdruk") : 0);
+  const regels = [
+    ["Materiaal (" + m2Bruto.toFixed(2) + " m² incl. inschiet)", materiaal],
+    ["Inkt (" + m2.toFixed(2) + " m²)", inkt],
+  ];
+  if (afwerkKosten > 0) regels.push([afwerkLabel, afwerkKosten]);
+  regels.push(["Arbeid & machine (" + Math.round(printMin + snijMin) + " min)", arbeid]);
+  regels.push(["Opstartkosten" + (inp.proef ? " + proefdruk" : ""), opstart]);
+  return finish({ regels, aantal: inp.aantal });
+}
+
+function calcBrochure(inp) {
+  const pagPerVel = inp.formaat === "a5" ? 8 : 4;
+  const binnenPag = inp.paginas - 4; // omslag = 4 pagina's
+  const velBinnenPerBoek = Math.ceil(binnenPag / pagPerVel);
+  const velOmslagPerBoek = inp.formaat === "a5" ? 0.5 : 1;
+  const inschiet = 1 + v("kleinDrukwerk", "inschiet") / 100;
+  const velBinnen = Math.ceil(velBinnenPerBoek * inp.oplage * inschiet);
+  const velOmslag = Math.ceil(velOmslagPerBoek * inp.oplage * inschiet);
+  const papier = velBinnen * inp.papierBinPrijs + velOmslag * inp.papierOmsPrijs;
+  const totVellen = velBinnen + velOmslag;
+  const klik = totVellen * 2 * v("kleinDrukwerk", "klikKleur"); // dubbelzijdig kleur
+  const binding = inp.oplage * (inp.binding === "niet" ? v("brochure", "nietjes") : v("brochure", "lijm"));
+  const printMin = (totVellen / v("kleinDrukwerk", "printSnelheid")) * 60;
+  const afwerkMin = (inp.oplage / v("brochure", "afwerkPerUur")) * 60;
+  const snijMin = v("kleinDrukwerk", "snijtijdBasis") + (totVellen / 1000) * v("kleinDrukwerk", "snijtijdPer1000");
+  const arbeid = ((printMin + afwerkMin + snijMin) / 60) * v("algemeen", "uurtarief");
+  const opstart = v("algemeen", "opstart") + (inp.proef ? v("algemeen", "proefdruk") : 0);
+  return finish({ regels: [
+    ["Papier binnenwerk (" + velBinnen + " vel) + omslag (" + velOmslag + " vel)", papier],
+    ["Klikkosten (" + (totVellen * 2) + " zijden kleur)", klik],
+    ["Binden (" + (inp.binding === "niet" ? "geniet" : "gelijmd") + ")", binding],
+    ["Arbeid & machine (" + Math.round(printMin + afwerkMin + snijMin) + " min)", arbeid],
+    ["Opstartkosten" + (inp.proef ? " + proefexemplaar" : ""), opstart],
+  ], aantal: inp.oplage });
+}
+
+function calcDoordruk(inp) {
+  const ups = UPS[inp.formaat];
+  const totVellenNetto = Math.ceil(inp.sets * inp.voud / ups);
+  const vellen = Math.ceil(totVellenNetto * (1 + v("kleinDrukwerk", "inschiet") / 100));
+  const papier = vellen * v("doordruk", "ncrVel");
+  const klikPrijs = inp.kleur === "kleur" ? v("kleinDrukwerk", "klikKleur") : v("kleinDrukwerk", "klikZwart");
+  const klik = vellen * inp.zijden * klikPrijs;
+  const blokken = Math.ceil(inp.sets / inp.setsPerBlok);
+  const blokMateriaal = blokken * (v("doordruk", "grijsbord") + v("doordruk", "lijmBlok"));
+  const nummeren = inp.nummeren ? inp.sets * v("doordruk", "nummerPerSet") : 0;
+  const printMin = (vellen / v("kleinDrukwerk", "printSnelheid")) * 60;
+  const snijMin = v("kleinDrukwerk", "snijtijdBasis") + (vellen / 1000) * v("kleinDrukwerk", "snijtijdPer1000");
+  const lijmMin = (blokken / v("doordruk", "blokkenPerUur")) * 60;
+  const arbeid = ((printMin + snijMin + lijmMin) / 60) * v("algemeen", "uurtarief");
+  const opstart = v("algemeen", "opstart") + (inp.proef ? v("algemeen", "proefdruk") : 0);
+  const regels = [
+    ["NCR-papier (" + vellen + " vel SRA3, incl. inschiet)", papier],
+    ["Klik-/inktkosten (" + (vellen * inp.zijden) + " zijden)", klik],
+    ["Grijsbord + lijm (" + blokken + " blokken)", blokMateriaal],
+  ];
+  if (nummeren > 0) regels.push(["Doornummeren (" + inp.sets.toLocaleString("nl-NL") + " sets)", nummeren]);
+  regels.push(["Arbeid & machine (" + Math.round(printMin + snijMin + lijmMin) + " min)", arbeid]);
+  regels.push(["Opstartkosten" + (inp.proef ? " + proefdruk" : ""), opstart]);
+  const r = finish({ regels, aantal: inp.sets });
+  r.eenheid = "set";
+  r.subInfo = blokken + " blokken à " + inp.setsPerBlok + " sets (" + inp.voud + "-voud)";
+  return r;
+}
+
+function finish({ regels, aantal }) {
+  const kostprijs = regels.reduce((s, r) => s + r[1], 0);
+  const margePct = v("algemeen", "marge");
+  const marge = kostprijs * margePct / 100;
+  const verkoopEx = kostprijs + marge;
+  const verkoopIncl = verkoopEx * (1 + v("algemeen", "btw") / 100);
+  return { regels, kostprijs, margePct, marge, verkoopEx, verkoopIncl, perStuk: verkoopEx / aantal, aantal };
+}
+/* ═════════════════ EINDE REKENFUNCTIES ═════════════════ */
+
+function renderResult(el, r) {
+  let html = "<table>";
+  for (const [label, bedrag] of r.regels) html += `<tr><td>${label}</td><td>${euro(bedrag)}</td></tr>`;
+  html += `<tr><td><strong>Kostprijs</strong></td><td><strong>${euro(r.kostprijs)}</strong></td></tr>`;
+  html += `<tr class="sub"><td>Marge (${r.margePct}%)</td><td>${euro(r.marge)}</td></tr>`;
+  html += `<tr class="total"><td>Verkoopprijs excl. btw</td><td>${euro(r.verkoopEx)}</td></tr>`;
+  html += "</table>";
+  const eenheid = r.eenheid || "stuk";
+  html += `<div class="price-big"><div class="amount">${euro(r.verkoopEx)}</div>
+    <div class="per">${euro(r.perStuk)} per ${eenheid} (excl. btw) · ${r.aantal.toLocaleString("nl-NL")} ${eenheid}s${r.subInfo ? " · " + r.subInfo : ""}</div>
+    <div class="incl">Incl. ${v("algemeen","btw")}% btw: ${euro(r.verkoopIncl)}</div></div>`;
+  el.innerHTML = html;
+}
+
+/* ═════════════════ UI ═════════════════ */
+const $ = id => document.getElementById(id);
+
+// Tabs
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  $("panel-" + t.dataset.panel).classList.add("active");
+}));
+
+// Dropdowns vullen
+function fillPapier(sel, defaultId) {
+  sel.innerHTML = PAPIER.map(p => `<option value="${p.id}" ${p.id === defaultId ? "selected" : ""}>${p.label} — ${euro(p.prijs)}/vel</option>`).join("");
+}
+fillPapier($("k-papier"), "mc135");
+fillPapier($("b-papier-bin"), "mc135");
+fillPapier($("b-papier-oms"), "mc250");
+$("g-materiaal").innerHTML = MATERIAAL.map(m => `<option value="${m.id}">${m.label} — ${euro(m.prijs)}/m²</option>`).join("");
+$("g-materiaal").value = "banner";
+
+const papierPrijs = id => PAPIER.find(p => p.id === id).prijs;
+
+function updateKlein() {
+  renderResult($("k-result"), calcKlein({
+    oplage: +$("k-oplage").value || 1,
+    formaat: $("k-formaat").value,
+    papierPrijs: papierPrijs($("k-papier").value),
+    zijden: +$("k-zijden").value,
+    kleur: $("k-kleur").value,
+    vouwen: +$("k-vouwen").value,
+    proef: $("k-proef").checked,
+  }));
+}
+function updateGroot() {
+  renderResult($("g-result"), calcGroot({
+    breedte: +$("g-breedte").value || 1,
+    hoogte: +$("g-hoogte").value || 1,
+    aantal: +$("g-aantal").value || 1,
+    materiaalPrijs: MATERIAAL.find(m => m.id === $("g-materiaal").value).prijs,
+    afwerking: $("g-afwerking").value,
+    proef: $("g-proef").checked,
+  }));
+}
+function updateBrochure() {
+  let pag = Math.max(8, Math.round((+$("b-paginas").value || 8) / 4) * 4);
+  renderResult($("b-result"), calcBrochure({
+    oplage: +$("b-oplage").value || 1,
+    paginas: pag,
+    formaat: $("b-formaat").value,
+    papierBinPrijs: papierPrijs($("b-papier-bin").value),
+    papierOmsPrijs: papierPrijs($("b-papier-oms").value),
+    binding: $("b-binding").value,
+    proef: $("b-proef").checked,
+  }));
+}
+function updateDoordruk() {
+  renderResult($("d-result"), calcDoordruk({
+    sets: +$("d-sets").value || 1,
+    formaat: $("d-formaat").value,
+    voud: +$("d-voud").value,
+    setsPerBlok: +$("d-setsperblok").value || 50,
+    zijden: +$("d-zijden").value,
+    kleur: $("d-kleur").value,
+    nummeren: $("d-nummeren").checked,
+    proef: $("d-proef").checked,
+  }));
+}
+function updateAll() { updateKlein(); updateGroot(); updateBrochure(); updateDoordruk(); }
+
+document.querySelectorAll("#panel-klein input, #panel-klein select").forEach(e => e.addEventListener("input", updateKlein));
+document.querySelectorAll("#panel-groot input, #panel-groot select").forEach(e => e.addEventListener("input", updateGroot));
+document.querySelectorAll("#panel-brochure input, #panel-brochure select").forEach(e => e.addEventListener("input", updateBrochure));
+document.querySelectorAll("#panel-doordruk input, #panel-doordruk select").forEach(e => e.addEventListener("input", updateDoordruk));
+
+// Instellingen renderen
+const CAT_LABELS = { algemeen: "Algemeen", kleinDrukwerk: "Klein drukwerk", grootFormaat: "Groot formaat", brochure: "Brochures", doordruk: "Doordruksets" };
+function renderSettings() {
+  const host = $("settings");
+  let html = "";
+  for (const [cat, items] of Object.entries(S)) {
+    html += `<div><h3>${CAT_LABELS[cat]}</h3>`;
+    for (const [key, item] of Object.entries(items)) {
+      html += `<div class="set-row"><span>${item.label}</span><input type="number" step="any" data-cat="${cat}" data-key="${key}" value="${item.value}"></div>`;
+    }
+    html += "</div>";
+  }
+  // Papier- en materiaalprijzen
+  html += `<div><h3>Papierprijzen (per SRA3-vel)</h3>` + PAPIER.map((p, i) =>
+    `<div class="set-row"><span>${p.label}</span><input type="number" step="any" data-papier="${i}" value="${p.prijs}"></div>`).join("") + "</div>";
+  html += `<div><h3>Materiaalprijzen (per m²)</h3>` + MATERIAAL.map((m, i) =>
+    `<div class="set-row"><span>${m.label}</span><input type="number" step="any" data-materiaal="${i}" value="${m.prijs}"></div>`).join("") + "</div>";
+  host.innerHTML = html;
+  host.querySelectorAll("input").forEach(inp => inp.addEventListener("input", () => {
+    const val = parseFloat(inp.value) || 0;
+    if (inp.dataset.cat) S[inp.dataset.cat][inp.dataset.key].value = val;
+    if (inp.dataset.papier !== undefined) { PAPIER[+inp.dataset.papier].prijs = val; fillPapierAll(); }
+    if (inp.dataset.materiaal !== undefined) { MATERIAAL[+inp.dataset.materiaal].prijs = val; refreshMateriaal(); }
+    updateAll();
+  }));
+}
+function fillPapierAll() {
+  for (const [selId] of [["k-papier"], ["b-papier-bin"], ["b-papier-oms"]]) {
+    const sel = $(selId), cur = sel.value;
+    fillPapier(sel, cur);
+  }
+}
+function refreshMateriaal() {
+  const sel = $("g-materiaal"), cur = sel.value;
+  sel.innerHTML = MATERIAAL.map(m => `<option value="${m.id}">${m.label} — ${euro(m.prijs)}/m²</option>`).join("");
+  sel.value = cur;
+}
+
+renderSettings();
+updateAll();
+</script>
+</body>
+</html>
